@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>Rankup</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ===== انیمیشن ورود ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #140022, #000000);
+    color: white;
+    animation: fadeIn 1s ease;
+}
+
+/* ===== محتوا ===== */
+.container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* ===== کارت ===== */
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px #bb66ff;
+}
+
+/* ===== دکمه ===== */
+.button-main {
+    padding: 12px 25px;
+    font-size: 18px;
+    background: #6600cc;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 10px;
+}
+
+.button-main:hover {
+    background: #bb66ff;
+    box-shadow: 0 0 20px #bb66ff;
+}
+
+/* ===== فرم ثبت نام ===== */
+.register-container {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    width: 350px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 30px #bb66ff;
+}
+
+.register-container input {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.register-container input::placeholder {
+    color: #ccc;
+}
+
+/* ===== جدول نمایش ثبت نام ===== */
+table {
+    width: 80%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    color: white;
+}
+
+th, td {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: rgba(102,0,204,0.5);
+}
+.copy-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    background: #6600cc;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.copy-btn:hover {
+    background: #bb66ff;
+    box-shadow: 0 0 20px #bb66ff;
+}
+
+.delete-btn {
+    background: #cc0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.delete-btn:hover {
+    background: #ff4444;
+    box-shadow: 0 0 10px #ff4444;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <a href="index.html">
+        <button class="button-main"><i class="fas fa-home"></i> Home</button>
+    </a>
+
+    <!-- فرم ثبت نام -->
+    <div class="register-container">
+        <h2>ثبت نام</h2>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="نام کاربری" required><br>
+            <input type="text" id="number" placeholder="شماره تلفن" required><br>
+            <input type="password" id="password" placeholder="رمز عبور" required><br>
+            <button type="submit" class="button-main">ثبت نام</button>
+        </form>
+    </div>
+
+    <!-- جدول نمایش ثبت نام‌ها -->
+    <div class="card">
+        <h3>لیست ثبت نام‌ها</h3>
+        <button onclick="clearAllUsers()" class="delete-btn" style="margin-bottom: 10px;">پاک کردن همه</button>
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>نام کاربری</th>
+                    <th>شماره</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ثبت نام‌ها اینجا اضافه می‌شوند -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// آرایه برای ذخیره کاربران
+let users = [];
+
+// بارگذاری داده‌ها از localStorage هنگام شروع
+function loadUsers() {
+    const savedUsers = localStorage.getItem('users');
+    if (savedUsers) {
+        users = JSON.parse(savedUsers);
+        displayUsers();
+    }
+}
+
+// نمایش کاربران در جدول
+function displayUsers() {
+    const tableBody = document.getElementById("usersTable").getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = ''; // پاک کردن جدول
+    
+    users.forEach((user, index) => {
+        const newRow = tableBody.insertRow();
+        newRow.insertCell(0).innerText = user.username;
+        newRow.insertCell(1).innerText = user.number;
+        
+        // دکمه حذف
+        const deleteCell = newRow.insertCell(2);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerText = 'حذف';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.onclick = function() { deleteUser(index); };
+        deleteCell.appendChild(deleteBtn);
+    });
+}
+
+// افزودن کاربر جدید
+function addUser(username, number, password) {
+    users.push({
+        username: username,
+        number: number,
+        password: password
+    });
+    
+    // ذخیره در localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // نمایش مجدد جدول
+    displayUsers();
+}
+
+// حذف کاربر
+function deleteUser(index) {
+    users.splice(index, 1);
+    localStorage.setItem('users', JSON.stringify(users));
+    displayUsers();
+}
+
+// پاک کردن همه کاربران
+function clearAllUsers() {
+    if (confirm('آیا از پاک کردن همه کاربران اطمینان دارید؟')) {
+        users = [];
+        localStorage.removeItem('users');
+        displayUsers();
+    }
+}
+
+// فرم ثبت نام
+document.getElementById("registerForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const number = document.getElementById("number").value;
+    const password = document.getElementById("password").value;
+
+    if (username && number && password) {
+        addUser(username, number, password);
+        
+        // پاک کردن فرم
+        this.reset();
+        alert('ثبت نام با موفقیت انجام شد!');
+    }
+});
+
+// بارگذاری کاربران هنگام باز شدن صفحه
+loadUsers();
+</script>
+
+</body>
+</html>
